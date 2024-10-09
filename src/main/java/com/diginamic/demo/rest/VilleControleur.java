@@ -1,92 +1,94 @@
 package com.diginamic.demo.rest;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.diginamic.demo.entite.Ville;
+import com.diginamic.demo.service.VilleService;
 
-import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/villes")
 @Validated
 public class VilleControleur {
 
-	private List<Ville> villes = new ArrayList<>();
+	@Autowired
+    private VilleService villeService;
 
-    private int idCounter = 1; // Démarre à 1 pour le premier ID
-
-    // Constructeur pour initialiser les villes
-    public VilleControleur() {
-        villes.add(new Ville(idCounter++, "Paris", 2148000));
-        villes.add(new Ville(idCounter++, "Lyon", 513275));
-        villes.add(new Ville(idCounter++, "Marseille", 861635));
-        villes.add(new Ville(idCounter++, "Toulouse", 479709));
-        villes.add(new Ville(idCounter++, "Nice", 340017));
+    // 1. Liste toutes les villes
+    @GetMapping
+    public List<Ville> getAllVilles() {
+        return villeService.findAll();
     }
 
-	@GetMapping
-	public List<Ville> getVilles() {
-		return villes;
-	}
+    // 2. Récupère une ville par ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Ville> getVilleById(@PathVariable int id) {
+        Ville ville = villeService.findById(id);
+        return ResponseEntity.ok(ville);
+    }
 
-	@PostMapping("/add")
-	public ResponseEntity<String> ajouterVille(@Valid @RequestBody Ville nouvelleVille) {
-		
-		for (Ville ville : villes) {
-			if (ville.getNom().equalsIgnoreCase(nouvelleVille.getNom())) {
-				return new ResponseEntity<>("La ville existe déjà", HttpStatus.BAD_REQUEST);
-			}
-		}
+    // 3. Récupère une ville par nom
+    @GetMapping("/nom/{nom}")
+    public ResponseEntity<Ville> getVilleByNom(@PathVariable String nom) {
+        return villeService.findByNom(nom)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
 
-		
-		nouvelleVille.setId(idCounter++); 
-		villes.add(nouvelleVille); 
+    // 4. Crée une nouvelle ville
+    @PostMapping
+    public ResponseEntity<Ville> createVille(@RequestBody Ville ville) {
+        Ville createdVille = villeService.save(ville);
+        return ResponseEntity.status(201).body(createdVille);
+    }
 
-		return new ResponseEntity<>("Ville insérée avec succès", HttpStatus.OK); // Code 200 (succès)
-	}
+    // 5. Met à jour une ville existante
+    @PutMapping("/{id}")
+    public ResponseEntity<Ville> updateVille(@PathVariable int id, @RequestBody Ville ville) {
+        ville.setId(id);
+        Ville updatedVille = villeService.save(ville);
+        return ResponseEntity.ok(updatedVille);
+    }
 
-	@PutMapping("/modify/{id}")
-	public ResponseEntity<String> modifierVille(@PathVariable int id, @Valid @RequestBody Ville villeModifiee) {
-	    // Vérifier si la ville existante est présente
-	    Ville villeExistante = villes.stream()
-	            .filter(ville -> ville.getId() == id)
-	            .findFirst()
-	            .orElse(null);
+    // 6. Supprime une ville par ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVille(@PathVariable int id) {
+        villeService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/departements/{departmentId}/largest/{n}")
+    public ResponseEntity<List<Ville>> getTopNLargestCitiesByDepartment(
+            @PathVariable int departmentId,
+            @PathVariable int n) {
+        List<Ville> villes = villeService.findTopNLargestCitiesByDepartment(departmentId, n);
+        return ResponseEntity.ok(villes);
+    }
 
-	    if (villeExistante == null) {
-	        return new ResponseEntity<>("Ville non trouvée", HttpStatus.NOT_FOUND);
-	    }
-
-	    // Vérifier si une autre ville a les mêmes détails (nom et nbHabitants)
-	    boolean detailsIdentiques = villes.stream()
-	            .filter(ville -> ville.getId() != id) // Exclure la ville actuelle
-	            .anyMatch(ville -> 
-	                ville.getNom().equalsIgnoreCase(villeModifiee.getNom()) &&
-	                ville.getNbHabitants() == villeModifiee.getNbHabitants()
-	            );
-
-	    if (detailsIdentiques) {
-	        return new ResponseEntity<>("Une ville avec ces mêmes renseignements existe déjà", HttpStatus.BAD_REQUEST);
-	    }
-
-	    // Appliquer les modifications
-	    villeExistante.setNom(villeModifiee.getNom());
-	    villeExistante.setNbHabitants(villeModifiee.getNbHabitants());
-
-	    return new ResponseEntity<>("Ville mise à jour avec succès", HttpStatus.OK);
-	}
-
-
+    // Endpoint pour lister les villes ayant une population comprise entre min et max
+    @GetMapping("/departements/{departmentId}/population")
+    public ResponseEntity<List<Ville>> getCitiesByPopulationRangeAndDepartment(
+            @RequestParam int minPopulation,
+            @RequestParam int maxPopulation,
+            @PathVariable int departmentId) {
+        List<Ville> villes = villeService.findCitiesByPopulationRangeAndDepartment(minPopulation, maxPopulation, departmentId);
+        return ResponseEntity.ok(villes);
+    }
+    
+    
 }

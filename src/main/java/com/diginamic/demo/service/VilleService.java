@@ -1,52 +1,59 @@
 package com.diginamic.demo.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.diginamic.demo.dao.VilleDao;
 import com.diginamic.demo.entite.Ville;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
+
 
 @Service
-public class VilleService implements VilleDao {
+public class VilleService {
 
-	@PersistenceContext
-	private EntityManager entityManager;
+    @Autowired
+    private VilleDao villeDao;
 
-	@Override
-	public List<Ville> findAll() {
-		TypedQuery<Ville> query = entityManager.createQuery("SELECT v FROM Ville v", Ville.class);
-		return query.getResultList();
-	}
+    @Transactional
+    public List<Ville> findAll() {
+        return villeDao.findAll();
+    }
 
-	@Override
-	public Ville findById(int id) {
-		return entityManager.find(Ville.class, id);
-	}
+    @Transactional
+    public Ville findById(int id) {
+        return villeDao.findById(id);
+    }
 
-	@Override
-	public Ville save(Ville ville) {
+    @Transactional
+    public Ville save(Ville ville) {
+        return villeDao.save(ville);
+    }
 
-		if (ville.getId() == 0) {
-			entityManager.persist(ville);
-			return ville;
-		} else {
+    @Transactional
+    public void delete(int id) {
+        villeDao.delete(id);
+    }
 
-			return entityManager.merge(ville);
-		}
-	}
+    @Transactional
+    public Optional<Ville> findByNom(String nom) {
+        return villeDao.findByNom(nom);
+    }
+    
+    @Transactional
+    public Ville update(Ville ville) {
+        return villeDao.update(ville);
+    }
+    @Transactional
+    public List<Ville> findTopNLargestCitiesByDepartment(int departmentId, int n) {
+        return villeDao.findTopNLargestCitiesByDepartment(departmentId, n);
+    }
 
-	@Override
-	public void delete(int id) {
-		Ville ville = findById(id);
-		if (ville != null) {
-			entityManager.remove(ville);
-		}
-
-	}
-
+    @Transactional
+    public List<Ville> findCitiesByPopulationRangeAndDepartment(int minPopulation, int maxPopulation, int departmentId) {
+        return villeDao.findCitiesByPopulationRangeAndDepartment(minPopulation, maxPopulation, departmentId);
+    }
 }
