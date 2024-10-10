@@ -24,7 +24,7 @@ public class DepartementControleur {
 	@Autowired
     private DepartementService departementService;
 
-    // 1. Liste tous les départements
+    
     @GetMapping
     public List<Departement> getAllDepartements() {
         return departementService.findAll();

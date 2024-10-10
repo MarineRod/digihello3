@@ -16,60 +16,73 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 public class Departement {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    @NotBlank(message = "Le nom du département ne peut pas être nul.")
-    private String nom;
+	@NotBlank(message = "Le nom du département ne peut pas être nul")
+	private String nom;
 
-    @OneToMany(mappedBy = "departement", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // pour gérer la sérialisation
-    private List<Ville> villes = new ArrayList<>();
+	private String code;
 
-    // Constructeurs, getters et setters
+	@OneToMany(mappedBy = "departement")
+	@JsonManagedReference
+	private List<Ville> villes = new ArrayList<>();
 
-    public Departement() {
-    }
+	public Departement() {
+		super();
+	}
 
-    public Departement(int id, String nom) {
-        this.id = id;
-        this.nom = nom;
-    }
+	public Departement(int id, @NotBlank(message = "Le nom du département ne peut pas être nul") String nom,
+			String code, List<Ville> villes) {
+		super();
+		this.id = id;
+		this.nom = nom;
+		this.code = code;
+		this.villes = villes;
+	}
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getNom() {
-        return nom;
-    }
+	public String getNom() {
+		return nom;
+	}
 
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
 
-    public List<Ville> getVilles() {
-        return villes;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public void setVilles(List<Ville> villes) {
-        this.villes = villes;
-    }
+	public void setCode(String code) {
+		this.code = code;
+	}
 
-    // Méthode d'ajout d'une ville pour gérer la relation bidirectionnelle
-    public void addVille(Ville ville) {
-        villes.add(ville);
-        ville.setDepartement(this);
-    }
+	public List<Ville> getVilles() {
+		return villes;
+	}
 
-    // Méthode de suppression d'une ville
-    public void removeVille(Ville ville) {
-        villes.remove(ville);
-        ville.setDepartement(null);
-    }
+	public void setVilles(List<Ville> villes) {
+		this.villes = villes;
+	}
+
+	// Méthode d'ajout d'une ville pour gérer la relation bidirectionnelle
+	public void addVille(Ville ville) {
+		villes.add(ville);
+		ville.setDepartement(this);
+	}
+
+	// Méthode de suppression d'une ville
+	public void removeVille(Ville ville) {
+		villes.remove(ville);
+		ville.setDepartement(null);
+	}
 }

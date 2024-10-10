@@ -1,94 +1,73 @@
 package com.diginamic.demo.rest;
 
-
+import java.awt.print.Pageable;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.diginamic.demo.entite.Departement;
 import com.diginamic.demo.entite.Ville;
 import com.diginamic.demo.service.VilleService;
 
-
-
 @RestController
 @RequestMapping("/villes")
-@Validated
 public class VilleControleur {
 
-	@Autowired
+    @Autowired
     private VilleService villeService;
 
-    // 1. Liste toutes les villes
     @GetMapping
     public List<Ville> getAllVilles() {
-        return villeService.findAll();
+        return villeService.getAllVilles();
+    }
+    // Recherche de toutes les villes dont le nom commence par une chaîne de caractères donnée
+    @GetMapping("/recherche-nom")
+    public List<Ville> rechercherParNom(@RequestParam("prefix") String prefix) {
+        return villeService.rechercherVillesParNomPrefixe(prefix);
     }
 
-    // 2. Récupère une ville par ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Ville> getVilleById(@PathVariable int id) {
-        Ville ville = villeService.findById(id);
-        return ResponseEntity.ok(ville);
+    // Recherche de toutes les villes dont le nombre d'habitants est supérieur à min
+    @GetMapping("/recherche-nbHabitants")
+    public List<Ville> rechercherParNbHabitants(@RequestParam("min") int min) {
+        return villeService.rechercherVillesParNbHabitantsMin(min);
     }
 
-    // 3. Récupère une ville par nom
-    @GetMapping("/nom/{nom}")
-    public ResponseEntity<Ville> getVilleByNom(@PathVariable String nom) {
-        return villeService.findByNom(nom)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    // Recherche de toutes les villes dont le nombre d'habitants est supérieur à min et inférieur à max
+    @GetMapping("/recherche-nbHabitants-min-max")
+    public List<Ville> rechercherParNbHabitantsMinEtMax(@RequestParam("min") int min, @RequestParam("max") int max) {
+        return villeService.rechercherVillesParNbHabitantsMinEtMax(min, max);
     }
 
-    // 4. Crée une nouvelle ville
-    @PostMapping
-    public ResponseEntity<Ville> createVille(@RequestBody Ville ville) {
-        Ville createdVille = villeService.save(ville);
-        return ResponseEntity.status(201).body(createdVille);
-    }
-
-    // 5. Met à jour une ville existante
-    @PutMapping("/{id}")
-    public ResponseEntity<Ville> updateVille(@PathVariable int id, @RequestBody Ville ville) {
-        ville.setId(id);
-        Ville updatedVille = villeService.save(ville);
-        return ResponseEntity.ok(updatedVille);
-    }
-
-    // 6. Supprime une ville par ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVille(@PathVariable int id) {
-        villeService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @GetMapping("/departements/{departmentId}/largest/{n}")
-    public ResponseEntity<List<Ville>> getTopNLargestCitiesByDepartment(
-            @PathVariable int departmentId,
-            @PathVariable int n) {
-        List<Ville> villes = villeService.findTopNLargestCitiesByDepartment(departmentId, n);
+    @GetMapping("/departement/{code}/habitant/superieur/{min}")
+    public ResponseEntity<List<Ville>> getVillesByDepartementCodeAndNbHabitantsGreaterThan(
+            @PathVariable String code,
+            @PathVariable int min) {
+        List<Ville> villes = villeService.findByDepartementCodeAndNbHabitantsGreaterThan(code, min);
         return ResponseEntity.ok(villes);
     }
 
-    // Endpoint pour lister les villes ayant une population comprise entre min et max
-    @GetMapping("/departements/{departmentId}/population")
-    public ResponseEntity<List<Ville>> getCitiesByPopulationRangeAndDepartment(
-            @RequestParam int minPopulation,
-            @RequestParam int maxPopulation,
-            @PathVariable int departmentId) {
-        List<Ville> villes = villeService.findCitiesByPopulationRangeAndDepartment(minPopulation, maxPopulation, departmentId);
+    // Endpoint pour trouver les villes par code de département dans une plage de nombre d'habitants
+    @GetMapping("/departement/{code}/habitant/plage")
+    public ResponseEntity<List<Ville>> getVillesByDepartementCodeAndNbHabitantsRange(
+            @PathVariable String code,
+            @RequestParam int min,
+            @RequestParam int max) {
+        List<Ville> villes = villeService.findByDepartementCodeAndNbHabitantsGreaterThanAndNbHabitantsLessThan(code, min, max);
         return ResponseEntity.ok(villes);
     }
-    
-    
+
+//    // Endpoint pour trouver les N villes par code de département, triées par nombre d'habitants
+//    @GetMapping("/departement/{code}/top")
+//    public ResponseEntity<List<Ville>> getTopNVillesByDepartementCode(
+//            @PathVariable String code,
+//            Pageable pageable) {
+//        List<Ville> villes = villeService.findTopNByDepartementCodeOrderByNbHabitantsDesc(code, pageable);
+//        return ResponseEntity.ok(villes);
+//    }
 }

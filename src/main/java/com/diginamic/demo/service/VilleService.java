@@ -1,59 +1,57 @@
 package com.diginamic.demo.service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.diginamic.demo.dao.VilleDao;
-import com.diginamic.demo.entite.Ville;
 
-import jakarta.transaction.Transactional;
+import com.diginamic.demo.entite.Departement;
+import com.diginamic.demo.entite.Ville;
+import com.diginamic.demo.repository.VilleRepository;
+import org.springframework.data.domain.Pageable;
 
 
 @Service
 public class VilleService {
 
     @Autowired
-    private VilleDao villeDao;
-
-    @Transactional
-    public List<Ville> findAll() {
-        return villeDao.findAll();
-    }
-
-    @Transactional
-    public Ville findById(int id) {
-        return villeDao.findById(id);
-    }
-
-    @Transactional
-    public Ville save(Ville ville) {
-        return villeDao.save(ville);
-    }
-
-    @Transactional
-    public void delete(int id) {
-        villeDao.delete(id);
-    }
-
-    @Transactional
-    public Optional<Ville> findByNom(String nom) {
-        return villeDao.findByNom(nom);
-    }
+    private VilleRepository villeRepository;
     
-    @Transactional
-    public Ville update(Ville ville) {
-        return villeDao.update(ville);
-    }
-    @Transactional
-    public List<Ville> findTopNLargestCitiesByDepartment(int departmentId, int n) {
-        return villeDao.findTopNLargestCitiesByDepartment(departmentId, n);
+    public List<Ville> getAllVilles() {
+        return villeRepository.findAll();
     }
 
-    @Transactional
-    public List<Ville> findCitiesByPopulationRangeAndDepartment(int minPopulation, int maxPopulation, int departmentId) {
-        return villeDao.findCitiesByPopulationRangeAndDepartment(minPopulation, maxPopulation, departmentId);
+   
+    public List<Ville> rechercherVillesParNomPrefixe(String prefix) {
+        return villeRepository.findByNomStartingWith(prefix);
     }
+
+   
+    public List<Ville> rechercherVillesParNbHabitantsMin(int min) {
+        return villeRepository.findByNbHabitantsGreaterThan(min);
+    }
+
+  
+    public List<Ville> rechercherVillesParNbHabitantsMinEtMax(int min, int max) {
+        return villeRepository.findByNbHabitantsGreaterThanAndNbHabitantsLessThan(min, max);
+    }
+
+  
+ // Méthode pour trouver les villes par code de département et nombre d'habitants supérieur
+    public List<Ville> findByDepartementCodeAndNbHabitantsGreaterThan(String code, int min) {
+        return villeRepository.findByDepartementCodeAndNbHabitantsGreaterThan(code, min);
+    }
+
+    // Méthode pour trouver les villes par code de département avec un nombre d'habitants dans une plage
+    public List<Ville> findByDepartementCodeAndNbHabitantsGreaterThanAndNbHabitantsLessThan(String code, int min, int max) {
+        return villeRepository.findByDepartementCodeAndNbHabitantsGreaterThanAndNbHabitantsLessThan(code, min, max);
+    }
+
+//    // Méthode pour trouver les N villes par code de département, triées par nombre d'habitants décroissant
+//    public List<Ville> findTopNByDepartementCodeOrderByNbHabitantsDesc(String code, java.awt.print.Pageable pageable) {
+//        return villeRepository.findTopNByDepartementCodeOrderByNbHabitantsDesc(code, pageable);
+//    }
 }
