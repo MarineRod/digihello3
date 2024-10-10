@@ -6,44 +6,39 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.diginamic.demo.dao.DepartementDao;
 import com.diginamic.demo.entite.Departement;
+import com.diginamic.demo.repository.DepartementRepository;
 
-import jakarta.transaction.Transactional;
 
 @Service
 public class DepartementService {
 
-    @Autowired
-    private DepartementDao departementDao;
+	@Autowired
+	private DepartementRepository departementRepository;
 
-    @Transactional
-    public List<Departement> findAll() {
-        return departementDao.findAll();
-    }
+	// Méthode pour récupérer tous les départements
+	public List<Departement> getAllDepartements() {
+		return departementRepository.findAll();
+	}
 
-    @Transactional
-    public Departement findById(int id) {
-        return departementDao.findById(id);
-    }
+	// Méthode pour récupérer un département par ID
+	public Departement getDepartementById(int id) {
+		return departementRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Departement non trouvé pour l'id : " + id));
+	}
 
-    @Transactional
-    public Departement save(Departement departement) {
-        return departementDao.save(departement);
-    }
-    
-    @Transactional
-    public Departement update(Departement departement) {
-        return departementDao.update(departement);
-    }
+	// Méthode pour rechercher un département par nom
+	public Optional<Departement> getDepartementByNom(String nom) {
+		return departementRepository.findByNom(nom);
+	}
 
-    @Transactional
-    public void delete(int id) {
-        departementDao.delete(id);
-    }
+	// Méthode pour ajouter ou mettre à jour un département
+	public Departement saveDepartement(Departement departement) {
+		return departementRepository.save(departement);
+	}
 
-    @Transactional
-    public Optional<Departement> findByNom(String nom) {
-        return departementDao.findByNom(nom);
-    }
+	// Méthode pour supprimer un département par ID
+	public void deleteDepartement(int id) {
+		departementRepository.deleteById(id);
+	}
 }
