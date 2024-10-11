@@ -9,6 +9,7 @@ import com.diginamic.demo.entite.Ville;
 @Component
 public class DepartementMapper {
 
+	
     // Conversion de l'entité Departement en DepartementDto
     public DepartementDto toDto(Departement departement) {
         DepartementDto dto = new DepartementDto();
