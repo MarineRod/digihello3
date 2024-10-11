@@ -26,62 +26,56 @@ public class DepartementControleur {
     @Autowired
     private DepartementService departementService;
 
-    // Endpoint pour récupérer tous les départements
-    @GetMapping
-    public ResponseEntity<List<DepartementDto>> getAllDepartements() {
-        List<Departement> departements = departementService.getAllDepartements();
-        List<DepartementDto> departementDtos = departements.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(departementDtos);
-    }
-
-    // Endpoint pour récupérer un département par ID
-    @GetMapping("/{id}")
-    public ResponseEntity<DepartementDto> getDepartementById(@PathVariable int id) {
-        Departement departement = departementService.getDepartementById(id);
-        DepartementDto departementDto = convertToDto(departement);
-        return ResponseEntity.ok(departementDto);
-    }
-    
-    @GetMapping("/nom/{nom}")
-    public ResponseEntity<Optional<DepartementDto>> getDepartementByNom(@PathVariable String nom) {
-        Optional<Departement> departement = departementService.getDepartementByNom(nom);
-        return ResponseEntity.ok(departement.map(this::convertToDto));
-    }
-
-    // Endpoint pour créer un nouveau département
-    @PostMapping
-    public ResponseEntity<DepartementDto> createDepartement(@RequestBody DepartementDto departementDto) {
-        Departement departement = convertToEntity(departementDto);
-        Departement createdDepartement = departementService.saveDepartement(departement);
-        DepartementDto createdDepartementDto = convertToDto(createdDepartement);
-        return ResponseEntity.status(201).body(createdDepartementDto);
-    }
-
-    // Endpoint pour mettre à jour un département existant
-    @PutMapping("/{id}")
-    public ResponseEntity<DepartementDto> updateDepartement(@PathVariable int id, @RequestBody DepartementDto departementDto) {
-        Departement departement = convertToEntity(departementDto);
-        departement.setId(id);
-        Departement updatedDepartement = departementService.saveDepartement(departement);
-        DepartementDto updatedDepartementDto = convertToDto(updatedDepartement);
-        return ResponseEntity.ok(updatedDepartementDto);
-    }
-
-    // Endpoint pour supprimer un département par ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDepartement(@PathVariable int id) {
-        departementService.deleteDepartement(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // Méthodes utilitaires pour la conversion entre DTO et entité
-    private DepartementDto convertToDto(Departement departement) {
-        return new DepartementDto(departement.getCode(), departement.getNom());
-    }
-
-    private Departement convertToEntity(DepartementDto departementDto) {
-        return new Departement(departementDto.getCode(), departementDto.getNom(), departementDto.getNbHabitants());
-    }
+//    // Endpoint pour récupérer tous les départements
+//    @GetMapping
+//    public ResponseEntity<List<DepartementDto>> getAllDepartements() {
+//        List<Departement> departements = departementService.getAllDepartements();
+//        List<DepartementDto> departementDtos = departements.stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//        return ResponseEntity.ok(departementDtos);
+//    }
+//
+//    // Endpoint pour récupérer un département par ID
+//    @GetMapping("/{id}")
+//    public ResponseEntity<DepartementDto> getDepartementById(@PathVariable int id) {
+//        Departement departement = departementService.getDepartementById(id);
+//        DepartementDto departementDto = convertToDto(departement);
+//        return ResponseEntity.ok(departementDto);
+//    }
+//
+//    // Endpoint pour créer un nouveau département
+//    @PostMapping
+//    public ResponseEntity<DepartementDto> createDepartement(@RequestBody DepartementDto departementDto) {
+//        Departement departement = convertToEntity(departementDto);
+//        Departement createdDepartement = departementService.saveDepartement(departement);
+//        DepartementDto createdDepartementDto = convertToDto(createdDepartement);
+//        return ResponseEntity.status(201).body(createdDepartementDto);
+//    }
+//
+//    // Endpoint pour mettre à jour un département existant
+//    @PutMapping("/{id}")
+//    public ResponseEntity<DepartementDto> updateDepartement(@PathVariable int id, @RequestBody DepartementDto departementDto) {
+//        Departement departement = convertToEntity(departementDto);
+//        departement.setId(id);
+//        Departement updatedDepartement = departementService.saveDepartement(departement);
+//        DepartementDto updatedDepartementDto = convertToDto(updatedDepartement);
+//        return ResponseEntity.ok(updatedDepartementDto);
+//    }
+//
+//    // Endpoint pour supprimer un département par ID
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteDepartement(@PathVariable int id) {
+//        departementService.deleteDepartement(id);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    // Méthodes utilitaires pour la conversion entre DTO et entité
+//    private DepartementDto convertToDto(Departement departement) {
+//        return new DepartementDto(departement.getCode(), departement.getNom(), departement.);
+//    }
+//
+//    private Departement convertToEntity(DepartementDto departementDto) {
+//        return new Departement(departementDto.getCode(), departementDto.getNom(), departementDto.getNbHabitants());
+//    }
 }
