@@ -4,7 +4,7 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 
@@ -50,8 +50,8 @@ public class VilleService {
         return villeRepository.findByDepartementCodeAndNbHabitantsGreaterThanAndNbHabitantsLessThan(code, min, max);
     }
 
-//    // Méthode pour trouver les N villes par code de département, triées par nombre d'habitants décroissant
-//    public List<Ville> findTopNByDepartementCodeOrderByNbHabitantsDesc(String code, java.awt.print.Pageable pageable) {
-//        return villeRepository.findTopNByDepartementCodeOrderByNbHabitantsDesc(code, pageable);
-//    }
+    // Méthode pour trouver les N villes par code de département, triées par nombre d'habitants décroissant
+    public Page<Ville> findTopNByDepartementCodeOrderByNbHabitantsDesc(String code, Pageable pageable) {
+        return villeRepository.findTopNByDepartementCodeOrderByNbHabitantsDesc(code, pageable);
+    }
 }

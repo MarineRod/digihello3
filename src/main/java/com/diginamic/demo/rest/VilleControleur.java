@@ -1,9 +1,11 @@
 package com.diginamic.demo.rest;
 
-import java.awt.print.Pageable;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,12 +64,12 @@ public class VilleControleur {
         return ResponseEntity.ok(villes);
     }
 
-//    // Endpoint pour trouver les N villes par code de département, triées par nombre d'habitants
-//    @GetMapping("/departement/{code}/top")
-//    public ResponseEntity<List<Ville>> getTopNVillesByDepartementCode(
-//            @PathVariable String code,
-//            Pageable pageable) {
-//        List<Ville> villes = villeService.findTopNByDepartementCodeOrderByNbHabitantsDesc(code, pageable);
-//        return ResponseEntity.ok(villes);
-//    }
+    // Endpoint pour trouver les N villes par code de département, triées par nombre d'habitants
+    @GetMapping("/departement/{code}/top")
+    public ResponseEntity<Page<Ville>> getTopNVillesByDepartementCode(
+            @PathVariable String code,
+            Pageable pageable) {
+        Page<Ville> villes = villeService.findTopNByDepartementCodeOrderByNbHabitantsDesc(code, pageable);
+        return ResponseEntity.ok(villes);
+    }
 }
