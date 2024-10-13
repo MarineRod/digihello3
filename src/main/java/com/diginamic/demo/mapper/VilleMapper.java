@@ -11,7 +11,8 @@ public class VilleMapper {
 
     public VilleDto toDto(Ville ville) {
     	 VilleDto dto = new VilleDto();
-         dto.setCodeVille(ville.getId());  // L'id de Ville devient codeVille dans VilleDto
+         dto.setId(ville.getId()); 
+         dto.setNom(ville.getNom()); //L'id de Ville devient codeVille dans VilleDto
          dto.setNbHabitants(ville.getNbHabitants());
          dto.setCodeDepartement(ville.getDepartement().getCode());  // Utilisation du code du département
          dto.setNomDepartement(ville.getDepartement().getNom());  // Utilisation du nom du département
@@ -24,7 +25,7 @@ public class VilleMapper {
         }
 
         Ville ville = new Ville();
-        ville.setId(villeDto.getCodeVille()); // Assuming the codeVille is numeric
+        ville.setId(villeDto.getId()); // Assuming the codeVille is numeric
         ville.setNbHabitants(villeDto.getNbHabitants());
         
         Departement departement = new Departement();
