@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +33,15 @@ class VilleServiceTest {
 		assertThat(result).hasSize(2); // Paris et Parthenay
 		assertThat(result).extracting(Ville::getNom).contains("Paris", "Parthenay");
 
+	}
+
+	@Test
+	public void testRechercherVillesParNomPrefixe_AucuneCorrespondance() {
+		// Appeler la méthode avec un préfixe inexistant
+		List<Ville> result = villeService.rechercherVillesParNomPrefixe("Lon");
+
+		// Vérifier que la liste est vide
+		assertThat(result).isEmpty();
 	}
 
 }
