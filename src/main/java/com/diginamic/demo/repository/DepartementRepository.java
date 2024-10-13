@@ -15,4 +15,6 @@ public interface DepartementRepository extends JpaRepository<Departement, Intege
 
     // JpaRepository fournit déjà des méthodes comme save(), deleteById() et findAll(), 
     
+    Optional<Departement> findByCode(String code);
+    
 }

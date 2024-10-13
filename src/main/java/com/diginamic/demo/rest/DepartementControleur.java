@@ -1,11 +1,12 @@
 package com.diginamic.demo.rest;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.diginamic.demo.dto.DepartementDto;
 import com.diginamic.demo.entite.Departement;
+import com.diginamic.demo.exception.CustomValidationException;
 import com.diginamic.demo.mapper.DepartementMapper;
 import com.diginamic.demo.service.DepartementService;
 
@@ -25,54 +27,66 @@ import com.diginamic.demo.service.DepartementService;
 public class DepartementControleur {
 
 	@Autowired
+	private DepartementService departementService;
+
+	@Autowired
 	private DepartementMapper departementMapper;
-	
-    @Autowired
-    private DepartementService departementService;
 
-    // Endpoint pour récupérer tous les départements
-    @GetMapping
-    public ResponseEntity<List<DepartementDto>> getAllDepartements() {
-        List<Departement> departements = departementService.getAllDepartements();
-        List<DepartementDto> departementDtos = departements.stream()
-                .map(departementMapper::toDto) // Utilisation de departementMapper
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(departementDtos);
-    }
+	// Récupérer tous les départements en tant que DepartementDto
+	@GetMapping
+	public ResponseEntity<List<DepartementDto>> getAllDepartements() {
+		List<Departement> departements = departementService.getAllDepartements();
+		List<DepartementDto> departementDtos = departements.stream().map(departementMapper::toDto)
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(departementDtos);
+	}
 
-    // Endpoint pour récupérer un département par ID
-    @GetMapping("/{id}")
-    public ResponseEntity<DepartementDto> getDepartementById(@PathVariable int id) {
-        Departement departement = departementService.getDepartementById(id);
-        DepartementDto departementDto = departementMapper.toDto(departement); // Utilisation de departementMapper
-        return ResponseEntity.ok(departementDto);
-    }
+	// Récupérer un département par ID
+	@GetMapping("/{id}")
+	public ResponseEntity<DepartementDto> getDepartementById(@PathVariable int id) {
+		Departement departement = departementService.getDepartementById(id);
+		return ResponseEntity.ok(departementMapper.toDto(departement));
+	}
 
-    // Endpoint pour créer un nouveau département
-    @PostMapping
-    public ResponseEntity<DepartementDto> createDepartement(@RequestBody DepartementDto departementDto) {
-        Departement departement = departementMapper.toEntity(departementDto); // Utilisation de departementMapper
-        Departement createdDepartement = departementService.saveDepartement(departement);
-        DepartementDto createdDepartementDto = departementMapper.toDto(createdDepartement); // Utilisation de departementMapper
-        return ResponseEntity.status(201).body(createdDepartementDto);
-    }
+	// Recherche d'un département par nom
+	@GetMapping("/nom/{nom}")
+	public ResponseEntity<DepartementDto> getDepartementByNom(@PathVariable String nom) {
+		Optional<Departement> departement = departementService.getDepartementByNom(nom);
+		return departement.map(d -> ResponseEntity.ok(departementMapper.toDto(d)))
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-    // Endpoint pour mettre à jour un département existant
-    @PutMapping("/{id}")
-    public ResponseEntity<DepartementDto> updateDepartement(@PathVariable int id, @RequestBody DepartementDto departementDto) {
-        Departement departement = departementMapper.toEntity(departementDto); // Utilisation de departementMapper
-        departement.setId(id);
-        Departement updatedDepartement = departementService.saveDepartement(departement);
-        DepartementDto updatedDepartementDto = departementMapper.toDto(updatedDepartement); // Utilisation de departementMapper
-        return ResponseEntity.ok(updatedDepartementDto);
-    }
-    
-    // Endpoint pour supprimer un département par ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDepartement(@PathVariable int id) {
-        departementService.deleteDepartement(id);
-        return ResponseEntity.noContent().build();
-    }
+	// Création d'un nouveau département
+	@PostMapping
+	public ResponseEntity<DepartementDto> createDepartement(@RequestBody DepartementDto departementDto) throws CustomValidationException {
+		// Conversion de DepartementDto à Departement
+		Departement departement = departementMapper.toEntity(departementDto);
 
- 
+		// Sauvegarde du département
+		Departement savedDepartement = departementService.saveDepartement(departement);
+		// Retourne le département sauvegardé en DTO avec un statut 201 (CREATED)
+		return ResponseEntity.status(HttpStatus.CREATED).body(departementMapper.toDto(savedDepartement));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<DepartementDto> updateDepartement(@PathVariable int id,
+			@RequestBody DepartementDto departementDto) {
+		try {
+			Departement departement = departementMapper.toEntity(departementDto);
+			Departement updatedDepartement = departementService.updateDepartement(id, departement);
+			DepartementDto updatedDepartementDto = departementMapper.toDto(updatedDepartement);
+			return ResponseEntity.ok(updatedDepartementDto);
+		} catch (CustomValidationException e) {
+			return ResponseEntity.badRequest().body(new DepartementDto());
+		} catch (RuntimeException e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	// Suppression d'un département
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteDepartement(@PathVariable int id) {
+		departementService.deleteDepartement(id);
+		return ResponseEntity.noContent().build();
+	}
 }
