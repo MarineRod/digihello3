@@ -1,50 +1,54 @@
 package com.diginamic.demo.dto;
 
 public class VilleDto {
-    private int codeVille;
-    private int nbHabitants;
-    private String codeDepartement;
-    private String nomDepartement;
 
-    // Constructeurs, getters et setters
-    public VilleDto() {}
+	private String nom;
+	private int nbHabitants;
+	private String codeDepartement;
+	private String nomDepartement;
 
-    public VilleDto(int codeVille, int nbHabitants, String codeDepartement, String nomDepartement) {
-        this.codeVille = codeVille;
-        this.nbHabitants = nbHabitants;
-        this.codeDepartement = codeDepartement;
-        this.nomDepartement = nomDepartement;
-    }
+	// Constructeurs, getters et setters
+	public VilleDto() {
+	}
 
-    public int getCodeVille() {
-        return codeVille;
-    }
+	public VilleDto(String nom, int codeVille, int nbHabitants, String codeDepartement, String nomDepartement) {
+		super();
+		this.nom = nom;
+		this.nbHabitants = nbHabitants;
+		this.codeDepartement = codeDepartement;
+		this.nomDepartement = nomDepartement;
+	}
 
-    public void setCodeVille(int codeVille) {
-        this.codeVille = codeVille;
-    }
+	public String getNom() {
+		return nom;
+	}
 
-    public int getNbHabitants() {
-        return nbHabitants;
-    }
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
 
-    public void setNbHabitants(int nbHabitants) {
-        this.nbHabitants = nbHabitants;
-    }
+	public int getNbHabitants() {
+		return nbHabitants;
+	}
 
-    public String getCodeDepartement() {
-        return codeDepartement;
-    }
+	public void setNbHabitants(int nbHabitants) {
+		this.nbHabitants = nbHabitants;
+	}
 
-    public void setCodeDepartement(String codeDepartement) {
-        this.codeDepartement = codeDepartement;
-    }
+	public String getCodeDepartement() {
+		return codeDepartement;
+	}
 
-    public String getNomDepartement() {
-        return nomDepartement;
-    }
+	public void setCodeDepartement(String codeDepartement) {
+		this.codeDepartement = codeDepartement;
+	}
 
-    public void setNomDepartement(String nomDepartement) {
-        this.nomDepartement = nomDepartement;
-    }
+	public String getNomDepartement() {
+		return nomDepartement;
+	}
+
+	public void setNomDepartement(String nomDepartement) {
+		this.nomDepartement = nomDepartement;
+	}
+
 }
