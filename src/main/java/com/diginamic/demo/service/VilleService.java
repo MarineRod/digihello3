@@ -27,6 +27,10 @@ public class VilleService {
 	public List<Ville> rechercherVillesParNomPrefixe(String prefix) {
 		return villeRepository.findByNomStartingWith(prefix);
 	}
+	
+	public List<Ville> getVillesByDepartementCode(String code, Pageable pageable) {
+        return villeRepository.findByDepartementCode(code, pageable);
+    }
 
 	// Recherche des villes avec un nombre d'habitants supérieur à min
 	public List<Ville> rechercherVillesParNbHabitantsMin(int min) {
@@ -74,7 +78,7 @@ public class VilleService {
 
 		// 2. Le nom de la ville doit contenir au moins 2 lettres
 		if (ville.getNom() == null || ville.getNom().length() < 2) {
-			 throw new CustomValidationException("Le nom de la ville doit contenir au moins 2 lettres.");
+			throw new CustomValidationException("Le nom de la ville doit contenir au moins 2 lettres.");
 		}
 
 		// 3. Le code département doit comporter exactement 2 caractères
